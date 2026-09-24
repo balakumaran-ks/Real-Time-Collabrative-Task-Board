@@ -1,0 +1,336 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  :root {
+    --ink: #1b1330;
+    --ink-soft: #6b6280;
+    --line: #c7c2da;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink);
+  }
+  body {
+    width: 1280px;
+    background:
+      radial-gradient(circle at 1px 1px, #dcd7ee 1.5px, transparent 1.5px) 0 0/28px 28px,
+      linear-gradient(160deg, #f7f6fb 0%, #eef0fb 45%, #f4eefb 100%);
+  }
+
+  #stage {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 44px 0 40px;
+  }
+
+  .header { text-align: center; }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 14px;
+    border-radius: 999px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    color: #4f46e5;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px rgba(79,70,229,0.08);
+  }
+  .title {
+    margin-top: 14px;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .subtitle {
+    margin-top: 7px;
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+
+  svg.wires { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+
+  .spacer { width: 1px; flex-shrink: 0; }
+
+  .card {
+    position: relative;
+    z-index: 2;
+    border-radius: 20px;
+    background: #ffffff;
+    border: 1px solid #e6e2f2;
+    box-shadow: 0 1px 2px rgba(27,19,48,0.04), 0 18px 34px -18px rgba(51,38,110,0.28);
+    padding: 18px 22px;
+  }
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .icon-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
+  }
+  .card-name { font-size: 16.5px; font-weight: 800; }
+  .card-kicker {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 13px; }
+  .chip {
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #f6f5fb;
+    border: 1px solid #e9e6f4;
+    color: #524a6b;
+  }
+  .card-note { margin-top: 10px; font-size: 12px; color: var(--ink-soft); line-height: 1.5; max-width: 460px; }
+
+  #browser { width: 400px; }
+  #browser .icon-badge { background: linear-gradient(145deg,#818cf8,#4f46e5); }
+  #backend { width: 560px; }
+  #backend .icon-badge { background: linear-gradient(145deg,#a78bfa,#7c3aed); }
+  #postgres { width: 320px; }
+  #postgres .icon-badge { background: linear-gradient(145deg,#60a5fa,#2563eb); }
+  #redis { width: 320px; }
+  #redis .icon-badge { background: linear-gradient(145deg,#f87171,#dc2626); }
+
+  .row { display: flex; gap: 150px; }
+
+  .wire-label {
+    position: absolute;
+    z-index: 3;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+  }
+
+  .legend { display: flex; justify-content: center; gap: 10px; margin-top: 38px; }
+  .legend .pill {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11.5px; font-weight: 700;
+    padding: 6px 12px; border-radius: 999px;
+    background: #ffffff; border: 1px solid var(--line); color: #463f5c;
+  }
+  .legend .dot { width: 8px; height: 8px; border-radius: 50%; }
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <svg class="wires" id="wires"></svg>
+
+  <div class="header">
+    <span class="eyebrow">&#9679; System Design</span>
+    <div class="title">Real-Time Collaborative Task Board</div>
+    <div class="subtitle">One backend service &middot; REST for CRUD &middot; WebSocket rooms for live sync &middot; Postgres as source of truth</div>
+  </div>
+
+  <div class="spacer" style="height:52px;"></div>
+
+  <div class="card" id="browser">
+    <div class="card-top">
+      <div class="icon-badge">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2.5" y="4.5" width="19" height="14" rx="2.5"/>
+          <path d="M2.5 8.5h19"/>
+          <circle cx="5.3" cy="6.5" r="0.6" fill="white" stroke="none"/>
+          <circle cx="7.3" cy="6.5" r="0.6" fill="white" stroke="none"/>
+          <path d="M9 21.5h6M12 18.5v3"/>
+        </svg>
+      </div>
+      <div>
+        <div class="card-kicker" style="color:#4f46e5;">Client</div>
+        <div class="card-name">Browser &mdash; React SPA</div>
+      </div>
+    </div>
+    <div class="chip-row">
+      <span class="chip">React 19 + Router</span>
+      <span class="chip">Zustand</span>
+      <span class="chip">@dnd-kit board</span>
+      <span class="chip">Tailwind CSS</span>
+    </div>
+    <div class="card-note">Optimistic UI updates, reconciled by REST responses and live WebSocket events.</div>
+  </div>
+
+  <div class="spacer" style="height:150px;"></div>
+
+  <div class="card" id="backend">
+    <div class="card-top">
+      <div class="icon-badge">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2.5" y="3.5" width="19" height="7" rx="2"/>
+          <rect x="2.5" y="13.5" width="19" height="7" rx="2"/>
+          <circle cx="6.3" cy="7" r="0.9" fill="white" stroke="none"/>
+          <circle cx="6.3" cy="17" r="0.9" fill="white" stroke="none"/>
+          <path d="M10.3 7h7.2M10.3 17h7.2"/>
+        </svg>
+      </div>
+      <div>
+        <div class="card-kicker" style="color:#7c3aed;">Application</div>
+        <div class="card-name">Backend API</div>
+      </div>
+    </div>
+    <div class="chip-row">
+      <span class="chip">Express / Fastify</span>
+      <span class="chip">Socket.IO rooms</span>
+      <span class="chip">JWT auth + refresh</span>
+      <span class="chip">RBAC middleware</span>
+      <span class="chip">Optimistic-lock (version)</span>
+    </div>
+    <div class="card-note">Every mutation: validate role &rarr; write to Postgres &rarr; publish event to Redis &rarr; broadcast to the board&rsquo;s WebSocket room.</div>
+  </div>
+
+  <div class="spacer" style="height:150px;"></div>
+
+  <div class="row">
+    <div class="card" id="postgres">
+      <div class="card-top">
+        <div class="icon-badge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="5.5" rx="8.5" ry="3"/>
+            <path d="M3.5 5.5v13c0 1.66 3.8 3 8.5 3s8.5-1.34 8.5-3v-13"/>
+            <path d="M3.5 12c0 1.66 3.8 3 8.5 3s8.5-1.34 8.5-3"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-kicker" style="color:#2563eb;">Storage</div>
+          <div class="card-name">PostgreSQL</div>
+        </div>
+      </div>
+      <div class="chip-row">
+        <span class="chip">Users &amp; workspaces</span>
+        <span class="chip">Boards &amp; cards</span>
+        <span class="chip">Comments</span>
+      </div>
+      <div class="card-note">The single source of truth. Everything else is derived or cached.</div>
+    </div>
+
+    <div class="card" id="redis">
+      <div class="card-top">
+        <div class="icon-badge">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2 4 13.5h6.2L11 22l9-11.5h-6.2z" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="card-kicker" style="color:#dc2626;">Ephemeral state</div>
+          <div class="card-name">Redis</div>
+        </div>
+      </div>
+      <div class="chip-row">
+        <span class="chip">Pub/sub fan-out</span>
+        <span class="chip">Presence sets</span>
+        <span class="chip">Read cache</span>
+      </div>
+      <div class="card-note">Lets a second backend instance join later with zero app changes.</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="pill"><span class="dot" style="background:#4f46e5;"></span>Frontend</span>
+    <span class="pill"><span class="dot" style="background:#7c3aed;"></span>Backend</span>
+    <span class="pill"><span class="dot" style="background:#2563eb;"></span>Postgres</span>
+    <span class="pill"><span class="dot" style="background:#dc2626;"></span>Redis</span>
+  </div>
+
+</div>
+
+<script>
+  function rect(el, stageRect) {
+    const r = el.getBoundingClientRect();
+    return {
+      left: r.left - stageRect.left,
+      right: r.right - stageRect.left,
+      top: r.top - stageRect.top,
+      bottom: r.bottom - stageRect.top,
+      cx: r.left - stageRect.left + r.width / 2,
+    };
+  }
+
+  function addLabel(stage, text, x, y, color, border) {
+    const div = document.createElement('div');
+    div.className = 'wire-label';
+    div.textContent = text;
+    div.style.left = x + 'px';
+    div.style.top = y + 'px';
+    div.style.color = color;
+    div.style.borderColor = border;
+    stage.appendChild(div);
+  }
+
+  function curve(x1, y1, x2, y2) {
+    const midY = (y1 + y2) / 2;
+    return `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
+  }
+
+  window.addEventListener('load', () => {
+    const stage = document.getElementById('stage');
+    const stageRect = stage.getBoundingClientRect();
+    const svg = document.getElementById('wires');
+
+    const browser = rect(document.getElementById('browser'), stageRect);
+    const backend = rect(document.getElementById('backend'), stageRect);
+    const postgres = rect(document.getElementById('postgres'), stageRect);
+    const redis = rect(document.getElementById('redis'), stageRect);
+
+    const dx = 70; // horizontal offset between the two browser<->backend wires
+
+    const restPath = curve(browser.cx - dx, browser.bottom, backend.cx - dx, backend.top);
+    const wsPath = curve(browser.cx + dx, browser.bottom, backend.cx + dx, backend.top);
+    const pgPath = curve(backend.cx - 130, backend.bottom, postgres.cx, postgres.top);
+    const redisPath = curve(backend.cx + 130, backend.bottom, redis.cx, redis.top);
+
+    svg.innerHTML = `
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="#9089ad" />
+        </marker>
+      </defs>
+      <path d="${restPath}" fill="none" stroke="#9089ad" stroke-width="2" marker-end="url(#arrow)" />
+      <path d="${wsPath}" fill="none" stroke="#9089ad" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow)" />
+      <path d="${pgPath}" fill="none" stroke="#9089ad" stroke-width="2" marker-end="url(#arrow)" />
+      <path d="${redisPath}" fill="none" stroke="#9089ad" stroke-width="2" marker-end="url(#arrow)" />
+    `;
+
+    const midY1 = (browser.bottom + backend.top) / 2;
+    const midY2 = (backend.bottom + postgres.top) / 2;
+    const midY3 = (backend.bottom + redis.top) / 2;
+
+    addLabel(stage, 'REST · HTTPS', browser.cx - dx, midY1, '#4f46e5', '#c7c3f5');
+    addLabel(stage, 'WebSocket · Socket.IO', browser.cx + dx, midY1, '#7c3aed', '#ddd2fb');
+    addLabel(stage, 'SQL reads / writes', (backend.cx - 130 + postgres.cx) / 2, midY2, '#2563eb', '#c3d7fb');
+    addLabel(stage, 'pub/sub · cache · presence', (backend.cx + 130 + redis.cx) / 2, midY3, '#dc2626', '#f6c8c8');
+
+    svg.setAttribute('width', stageRect.width);
+    svg.setAttribute('height', stageRect.height);
+
+    document.body.setAttribute('data-ready', '1');
+  });
+</script>
+
+</body>
+</html>

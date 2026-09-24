@@ -1,5 +1,10 @@
 # Architecture
 
+> More detail: every diagram (C4, class, ER, sequence, state, deployment) is in
+> [`DIAGRAMS.md`](DIAGRAMS.md); the schema is in [`DATABASE.md`](DATABASE.md);
+> decisions and their alternatives are in [`adr/`](adr/); threats in
+> [`SECURITY.md`](SECURITY.md).
+
 ## System overview
 
 ![Architecture diagram: browser React SPA talks REST and WebSocket to a single Backend API, which writes to PostgreSQL and uses Redis for pub/sub, presence, and caching](assets/architecture-diagram.png)

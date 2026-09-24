@@ -36,13 +36,19 @@ seeds a demo user). Then start on `backend/README.md`.
 
 ## Docs
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — system design: how the
-  frontend, backend, Postgres, and Redis fit together, and the exact data
-  flow for opening a board and resolving a concurrent edit.
-- [`docs/API.md`](docs/API.md) — full REST + WebSocket API reference
-  (request/response shapes, status codes, event payloads).
-- [`backend/README.md`](backend/README.md) — the backend build guide:
-  what to build and in what order.
+| Doc | What's in it |
+|---|---|
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | System design: how the frontend, backend, Postgres, and Redis fit together, and the exact data flow for opening a board and resolving a concurrent edit |
+| [`docs/DIAGRAMS.md`](docs/DIAGRAMS.md) | C4 context + container, backend and frontend class diagrams, ER diagram, sequence diagrams (auth, open board, conflict, multi-instance fan-out, notifications), state machines, deployment |
+| [`docs/DATABASE.md`](docs/DATABASE.md) | Full Postgres DDL, the optimistic-lock query, ordering strategy, Redis keys |
+| [`docs/API.md`](docs/API.md) · [`docs/openapi.yaml`](docs/openapi.yaml) | Full REST + WebSocket reference (shapes, status codes, event payloads) and the machine-readable OpenAPI 3.1 spec |
+| [`docs/SECURITY.md`](docs/SECURITY.md) | Threat model: access control, WebSocket rooms, token handling, CSRF/CORS |
+| [`docs/TESTING.md`](docs/TESTING.md) | Test pyramid, the concurrent-edit and cross-instance tests |
+| [`docs/adr/`](docs/adr/) | Architecture decision records (why, alternatives, consequences) |
+| [`backend/README.md`](backend/README.md) | The backend build guide: what to build and in what order |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Workflow and conventions |
+
+Local infrastructure for the backend: `docker compose up -d` (Postgres + Redis).
 
 ## Why this project
 

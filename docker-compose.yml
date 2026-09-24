@@ -1,0 +1,40 @@
+# Local infrastructure only — the backend you build in backend/ runs on the host
+# (npm run dev). The frontend runs with `npm run dev` inside frontend/.
+#
+#   docker compose up -d        start Postgres + Redis
+#   docker compose down -v      stop and wipe data
+name: task-board
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: taskboard
+      POSTGRES_PASSWORD: taskboard
+      POSTGRES_DB: taskboard
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskboard -d taskboard"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    # Nothing here is a source of truth (pub/sub, presence, cache), so no persistence needed.
+    command: redis-server --save "" --appendonly no
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
